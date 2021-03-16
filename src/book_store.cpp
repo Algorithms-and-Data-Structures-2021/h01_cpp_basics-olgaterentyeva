@@ -17,11 +17,11 @@ ResizeStorageStatus resize_storage(Book *&storage, int size, int new_capacity) {
         return ResizeStorageStatus::NEGATIVE_SIZE;
     }
 //Tip 2: не забудьте высвободить ранее выделенную память под хранилище
-    Book *newStorage = new Book[new_capacity];
-    for (int i = 0; i < size; ++i) {
-        newStorage[i] = storage[i];
-    }
-    delete storage;
+    Book *new_storage = storage;
+    storage = new Book[new_capacity];
+    std::copy(new_storage, new_storage + size, storage);
+    delete[] new_storage;
+
     return ResizeStorageStatus::SUCCESS;
 }
 
@@ -32,10 +32,10 @@ BookStore::BookStore(const std::string &name) : name_{name} {
         throw std::invalid_argument("BookStore::name must not be empty");
     }
 // здесь мог бы быть ваш сотрясающий землю и выделяющий память код ...
-    this -> name_ = name;
-    this -> name_ = storage_capacity_;
+    name_ = name;
+    storage_capacity_ = kInitStorageCapacity;
 
-    Book bookStore[kInitStorageCapacity];
+    storage_ = new Book[storage_capacity_];
 }
 
 // 3. реализуйте деструктор ...
@@ -43,17 +43,25 @@ BookStore::~BookStore() {
 // здесь мог бы быть ваш высвобождающий разум от негатива код ...
 // Tip 1: я свободен ..., словно память в куче: не забудьте обнулить указатель
     delete[] storage_;
+    storage_ = nullptr;
+    storage_size_ = 0;
+    storage_capacity_ = 0;
 }
 
 // 4. реализуйте метод ...
 void BookStore::AddBook(const Book &book) {
-    if (storage_size_ == storage_capacity_) {
 // Tip 1: используйте функцию resize_storage_internal, задав новый размер хранилища
 // Tip 2: не забудьте обработать статус вызова функции
-        if (resize_storage_internal(kCapacityCoefficient) != ResizeStorageStatus::SUCCESS) return;
-    }
 // Tip 3: не забудьте добавить книгу в наше бездонное хранилище ...
+    if (storage_size_ == storage_capacity_) {
+       ResizeStorageStatus status = resize_storage_internal(storage_capacity_ + kCapacityCoefficient);
+       if (status != ResizeStorageStatus::SUCCESS) {
+           return;
+       }
+    }
     storage_[storage_size_] = book;
+    storage_size_++;
+
 }
 
 

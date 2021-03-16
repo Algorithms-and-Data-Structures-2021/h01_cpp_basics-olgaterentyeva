@@ -16,7 +16,6 @@ Author::Author(const std::string &full_name, int age, Sex sex) {
   this -> full_name_ = full_name;
   this -> age_ = age;
   this -> sex_ = sex;
-
 }
 
 void Author::SetAge(int age) {

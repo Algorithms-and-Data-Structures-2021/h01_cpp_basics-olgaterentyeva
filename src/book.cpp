@@ -24,7 +24,7 @@ Book::Book(const std::string &title,
   }
 
   // Tip 1: остались слезы на щеках, осталось лишь инициализировать поля ...
-    this -> title_ = title;
+    this -> title_= title;
     this -> content_ = content;
     this -> genre_ = genre;
     this -> publisher_ = publisher;
